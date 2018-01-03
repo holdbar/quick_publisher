@@ -1,3 +1,5 @@
+# main/views.py
+ 
 from django.http import Http404
 from django.shortcuts import render, redirect
 from .models import User

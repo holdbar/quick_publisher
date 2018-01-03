@@ -1,14 +1,11 @@
-# -*- coding: utf-8 -*-
+# main/models.py
 
-# quick_publisher
-# quick_publisher/core/models.py
-import uuid
-
-from django.urls import reverse
+import uuid 
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.db.models import signals
-from django.core.mail import send_mail
+from main.tasks import send_verification_email
+ 
  
 class UserAccountManager(BaseUserManager):
     use_in_migrations = True
@@ -47,9 +44,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     full_name = models.CharField('full name', blank=True, null=True, max_length=400)
     is_staff = models.BooleanField('staff status', default=False)
     is_active = models.BooleanField('active', default=True)
-    is_verified = models.BooleanField('verified', default=False)
-    verification_uuid = models.UUIDField('Unique verification UUID', default=uuid.uuid4)
-
+    is_verified = models.BooleanField('verified', default=False) # Add the `is_verified` flag
+    verification_uuid = models.UUIDField('Unique Verification UUID', default=uuid.uuid4)
  
     def get_short_name(self):
         return self.email
@@ -63,13 +59,6 @@ class User(AbstractBaseUser, PermissionsMixin):
 def user_post_save(sender, instance, signal, *args, **kwargs):
     if not instance.is_verified:
         # Send verification email
-        send_mail(
-            'Verify your QuickPublisher account',
-            'Follow this link to verify your account: '
-                'http://localhost:8000%s' % reverse('verify', kwargs={'uuid': str(instance.verification_uuid)}),
-            'from@quickpublisher.dev',
-            [instance.email],
-            fail_silently=False,
-        )
+        send_verification_email.delay(instance.pk)
  
 signals.post_save.connect(user_post_save, sender=User)

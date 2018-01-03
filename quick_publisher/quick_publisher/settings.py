@@ -20,7 +20,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '8xb+^8(!0+y4$rcnq4tba8j(4(or&1+7@yn-z=qrp_)9ces)$q'
+SECRET_KEY = 'enb1x_$vggdi-h=16w49n09a6n!s@ox0+&m6!scobpq#6vm7c3'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -37,8 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'core',
-    'publish',
+    'main',
+    'publisher',
+
 ]
 
 MIDDLEWARE = [
@@ -82,12 +83,20 @@ DATABASES = {
     }
 }
 
+# REDIS related settings 
+REDIS_HOST = 'localhost'
+REDIS_PORT = '6379'
+BROKER_URL = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
+BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600} 
+CELERY_RESULT_BACKEND = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
+
+
 # Email
 
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'mailfortsmonitor@gmail.com'
-EMAIL_HOST_PASSWORD = 'secret'
+EMAIL_HOST_PASSWORD = '14isodmin88'
 EMAIL_PORT = 587
 
 # Password validation
@@ -108,7 +117,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-AUTH_USER_MODEL = 'core.User'
+AUTH_USER_MODEL = 'main.User'
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
